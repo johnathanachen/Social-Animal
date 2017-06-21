@@ -21,7 +21,20 @@ class Application extends Component {
   componentDidMount(){
     auth.onAuthStateChanged((user) => {
       if (user) {
-        this.setState({ user })
+        this.setState({ user });
+
+        this.usersRef = database.ref('/users');
+        this.userRef = this.usersRef.child(user.uid);
+
+        this.userRef.once('value').then((snapshot) => {
+          if (snapshot.val()) return;
+          const userData = pick(user, ['displayName', 'photoURL', 'email']);
+          this.userRef.set(userData);
+        });
+
+        this.usersRef.on('value', (snapshot) => {
+          this.setState({ users: snapshot.val() });
+        });
       }
     });
   }
@@ -34,7 +47,20 @@ class Application extends Component {
         <header className="App--header">
           <h1>Social Animals</h1>
         </header>
-        <SignIn />
+        {
+          user
+          ? <div>
+              <section className="ProfileCards">
+                {
+                  map(users, (user, uid) => {
+                    return <ProfileCard key={uid} user={user} uid={uid} />
+                  })
+                }
+              </section>
+              <CurrentUser user={user} />
+           </div>
+          : <SignIn />
+        }
       </div>
     );
   }

@@ -7,7 +7,6 @@ const config = {
     projectId: "social-animal-89c3c",
     storageBucket: "social-animal-89c3c.appspot.com",
     messagingSenderId: "954383310232"
-
 };
 
 firebase.initializeApp(config);
